@@ -13,6 +13,6 @@ end
 
 script.on_event("compass-find-entity", locateHotkey)
 
-commands.add_command("locate","locate-help",locate)
-commands.add_command("l","locate-help",locate)
-commands.add_command("compass","locate-help",locate)
+commands.add_command("locate","command-help.locate",locate)
+commands.add_command("l","command-help.locate",locate)
+commands.add_command("compass","command-help.locate",locate)
