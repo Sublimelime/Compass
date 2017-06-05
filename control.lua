@@ -49,6 +49,28 @@ function findEntityAndPrintData(player, entity)
 
    -- Direction determinations
 
+   --first, get the angle between the two points, relative to horiz axis
+   local angle = nil
+   local xDiff = closestEntity.position.x-playerX
+   local yDiff = closestEntity.position.y-playerY
+   if xDiff == 0 then
+      if yDiff > 0 then
+         angle = 90
+      else
+         angle = -90
+      end
+   else
+      angle = math.deg(math.atan(yDiff/xDiff)) --calc angle
+      if xDiff > 0 then --fix the angle to be in all 4 quadrants
+         angle = angle + 180
+      elseif yDiff > 0 then
+         angle= angle + 360
+      end
+   end
+
+
+   game.print(angle)
+
    player.print("The closest " .. closestEntity.name .. " is " .. math.floor(distance) .. " tiles away, to the " ..direction .. ".")
 end
 
@@ -68,6 +90,10 @@ function locateHotkey(data)
    local player = game.players[data.player_index]
    if not player.cursor_stack.valid_for_read then --Nothing in the player's hand
       player.print("You need an entity in your hand to locate.")
+      if player.selected then
+         player.print("The internal name of the entity selected is: " .. player.selected.name)
+      end
+
    else
       local entityToLocate = player.cursor_stack.prototype.place_result
       if not entityToLocate then --Item cannot be placed, so has no location
