@@ -12,8 +12,8 @@ end
 -- Locates the entity based off of the provided name
 function locate(data)
    local player = game.players[data.player_index]
-   if (data.parameter and type(data.parameter[1]) == "string" and #data.parameter > 0) then --Check usage
-      findEntityAndPrintData(player,data.parameter[1])
+   if (data.parameter and type(data.parameter) == "string") then --Check usage
+      findEntityAndPrintData(player,data.parameter)
    else
       player.print("Please provide the internal name of the entity to locate, for example fast-inserter. Generally, this is close to the english name of the entity.")
    end
@@ -34,7 +34,6 @@ function locateHotkey(data)
    end
 end
 
-end
 
 script.on_event("compass-find-entity", locateHotkey)
 
