@@ -1,11 +1,55 @@
+--gets the distances between two entities
+function getDistance(ent1, ent2)
+   return math.sqrt(math.pow(math.abs(math.floor(ent2.position.x) - math.floor(ent1.position.x)), 2) + math.pow(math.abs(math.floor(ent2.position.y) - math.floor(ent1.position.y)), 2))
+end
+
+function searchArea(area, player, entity)
+   local count = game.surfaces[1].count_entities_filtered{area=area,name=entity}
+   if count > 0 then --found something
+      local smallestDistIndex = 1
+      local entities = game.surfaces[1].find_entities_filtered{area=area,name=entity}
+      for index, entity in pairs(entities) do
+         if getDistance(player, entity) < getDistance(player, entities[smallestDistIndex]) then
+            smallestDistIndex = index
+         end
+      end
+      if smallestDistIndex then
+         return entities[smallestDistIndex]
+      end
+   else
+      return nil
+   end
+end
+
 --Finds the closest entity, and prints data like distance, and rough direction
 function findEntityAndPrintData(player, entity)
-   local distance = 0
+   local closestEntity = nil
    local direction = ""
+   local playerX = player.position.x
+   local playerY = player.position.y
 
+   -- Distance determiniations
+   local area1 = {{playerX-30, playerY-30},{playerX+30,playerY + 30}}
+   local area2 = {{playerX-100, playerY-100},{playerX+100,playerY + 100}}
 
-   player.print("The closest " .. entity .. " is " .. distance .. " tiles away, to the " ..direction .. ".")
+   -- progressive checks, getting larger and larger
+   closestEntity = searchArea(area1,player,entity) --search immediate area
+   if not closestEntity then
+      closestEntity = searchArea(area2,player,entity) -- Search a bigger area
+      if not closestEntity then
+         closestEntity = searchArea(nil,player,entity) --search entire surface
+         if not closestEntity then
+            player.print("Could not find an entity with that name.")
+            return
+         end
+      end
+   end
 
+   local distance = getDistance(player, closestEntity)
+
+   -- Direction determinations
+
+   player.print("The closest " .. closestEntity.name .. " is " .. math.floor(distance) .. " tiles away, to the " ..direction .. ".")
 end
 
 
