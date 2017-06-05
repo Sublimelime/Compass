@@ -21,6 +21,38 @@ function searchArea(area, player, entity)
    end
 end
 
+
+--checks if a given 360deg angle is between two other angles.
+function angleBetween(angle, max, min)
+   if (max < min) then
+      return max <= angle and angle <= min
+   else
+      return max <= angle or angle <= min
+   end
+end
+
+
+-- Returns the cardinal direction of the angle, 0 is perfectly west.
+function getDirection(angle)
+   if angleBetween(angle, 22, 347) then --west
+      return "West"
+   elseif angleBetween(angle, 67, 22) then --southwest
+      return "Southwest"
+   elseif angleBetween(angle, 122, 67) then --north
+      return "South"
+   elseif angleBetween(angle, 167, 122) then --northwest
+      return "Southeast"
+   elseif angleBetween(angle, 212, 167) then --west
+      return "East"
+   elseif angleBetween(angle, 257, 212) then --southwest
+      return "Northeast"
+   elseif angleBetween(angle, 302, 257) then --south
+      return "North"
+   else
+      return "Northwest"
+   end
+end
+
 --Finds the closest entity, and prints data like distance, and rough direction
 function findEntityAndPrintData(player, entity)
    local closestEntity = nil
@@ -68,8 +100,10 @@ function findEntityAndPrintData(player, entity)
       end
    end
 
-
    game.print(angle)
+
+   -- Then, get the english direction off of that angle
+   direction = getDirection(math.floor(angle))
 
    player.print("The closest " .. closestEntity.name .. " is " .. math.floor(distance) .. " tiles away, to the " ..direction .. ".")
 end
