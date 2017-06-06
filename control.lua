@@ -1,6 +1,6 @@
 --gets the distances between two entities
 function getDistance(ent1, ent2)
-   return math.sqrt(math.pow(math.abs(math.floor(ent2.position.x) - math.floor(ent1.position.x)), 2) + math.pow(math.abs(math.floor(ent2.position.y) - math.floor(ent1.position.y)), 2))
+   return math.sqrt(math.pow(math.floor(ent2.position.x) - math.floor(ent1.position.x), 2) + math.pow(math.floor(ent2.position.y) - math.floor(ent1.position.y), 2))
 end
 
 function searchArea(area, player, entity)
@@ -60,6 +60,10 @@ function findEntityAndPrintData(player, entity)
 
    local distance = getDistance(player, closestEntity)
 
+   -- Make alert on map --------------
+
+   player.add_custom_alert(closestEntity, {type="virtual",name="signal-red"}, "Closest Entity", true) -- Puts an alert on the map that makes it even easier to locate
+
    -- Direction determinations -------------------------------------------
 
    --first, get the angle between the two points, relative to horiz axis
@@ -84,7 +88,7 @@ function findEntityAndPrintData(player, entity)
       end
    end
 
-   game.print(angle)
+   --game.print(angle)
    -- Then, get the cardinal direction off of that angle
 
    direction = getCardinal(angle)
