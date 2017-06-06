@@ -6,6 +6,6 @@
     "contact": "The best way to reach me is to PM me on Reddit, at /u/Gangsir. It is also possible to contact me by creating an issue on the github page of this project, in the homepage field.",
     "homepage": "https://github.com/TheRealGangsir/Compass",
     "factorio_version": "0.15",
-    "dependencies": ["base >= 0.15.14"],
+    "dependencies": ["base >= 0.15"],
     "description": "Adds a command and a keybind to find the nearest entity specified. It will give the distance, and rough direction. Useful for finding vehicles, setups, or biters."
 }

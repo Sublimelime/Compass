@@ -13,9 +13,7 @@ function searchArea(area, player, entity)
             smallestDistIndex = index
          end
       end
-      if smallestDistIndex then
-         return entities[smallestDistIndex]
-      end
+      return entities[smallestDistIndex]
    else
       return nil
    end
@@ -28,6 +26,7 @@ function getCardinal(degrees)
    end
 
    -- Divide the compass rose into 8 sections, and determine the direction off of those.
+   --Lua indexing tables by 1, reeee
    local cardinalTable = {[0]= "West",[1]= "North-west",[2]= "North", [3]="North-east",[4]= "East",
       [5]= "South-east",[6]= "South",[7]= "South-west",[8]= "West"}
    return cardinalTable[math.floor((degrees % 360) / 45)]
@@ -51,7 +50,7 @@ function findEntityAndPrintData(player, entity)
       closestEntity = searchArea(area2,player,entity) -- Search a bigger area
       if not closestEntity then
          closestEntity = searchArea(nil,player,entity) --search entire surface
-         if not closestEntity then
+         if not closestEntity then --Can't find anything
             player.print("Could not find that entity in the world.")
             return
          end
@@ -116,14 +115,13 @@ function locateHotkey(data)
       if player.selected then
          player.print("The internal name of the entity selected is: " .. player.selected.name)
       end
-
    else
       local entityToLocate = player.cursor_stack.prototype.place_result
       if not entityToLocate then --Item cannot be placed, so has no location
          player.print("This entity cannot be placed in the world, so cannot be located.")
-         return
+      else
+         findEntityAndPrintData(player,entityToLocate.name)
       end
-      findEntityAndPrintData(player,entityToLocate.name)
    end
 end
 
