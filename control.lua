@@ -21,36 +21,16 @@ function searchArea(area, player, entity)
    end
 end
 
-
---checks if a given 360deg angle is between two other angles.
-function angleBetween(angle, max, min)
-   if (max < min) then
-      return max <= angle and angle <= min
-   else
-      return max <= angle or angle <= min
+-- Returns a string of the cardinal direction based on the angle, 0-360 degrees.
+function getCardinal(degrees)
+   if degrees < 0 then
+      return nil
    end
-end
 
-
--- Returns the cardinal direction of the angle, 0 is perfectly west.
-function getDirection(angle)
-   if angleBetween(angle, 22, 347) then --west
-      return "West"
-   elseif angleBetween(angle, 67, 22) then --southwest
-      return "Southwest"
-   elseif angleBetween(angle, 122, 67) then --north
-      return "South"
-   elseif angleBetween(angle, 167, 122) then --northwest
-      return "Southeast"
-   elseif angleBetween(angle, 212, 167) then --west
-      return "East"
-   elseif angleBetween(angle, 257, 212) then --southwest
-      return "Northeast"
-   elseif angleBetween(angle, 302, 257) then --south
-      return "North"
-   else
-      return "Northwest"
-   end
+   -- Divide the compass rose into 8 sections, and determine the direction off of those.
+   local cardinalTable = {[0]= "West",[1]= "North-west",[2]= "North", [3]="North-east",[4]= "East",
+      [5]= "South-east",[6]= "South",[7]= "South-west",[8]= "West"}
+   return cardinalTable[math.floor((degrees % 360) / 45)]
 end
 
 --Finds the closest entity, and prints data like distance, and rough direction
@@ -60,18 +40,19 @@ function findEntityAndPrintData(player, entity)
    local playerX = player.position.x
    local playerY = player.position.y
 
-   -- Distance determiniations
-   local area1 = {{playerX-30, playerY-30},{playerX+30,playerY + 30}}
-   local area2 = {{playerX-100, playerY-100},{playerX+100,playerY + 100}}
+   -- Distance determiniations -------------------------------
 
-   -- progressive checks, getting larger and larger
+   local area1 = {{playerX-100, playerY-100},{playerX+100,playerY + 100}}
+   local area2 = {{playerX-200, playerY-200},{playerX+200,playerY + 200}}
+
+   -- progressive checks, getting larger and larger in an attempt to save performance, since most locating entities will be close
    closestEntity = searchArea(area1,player,entity) --search immediate area
    if not closestEntity then
       closestEntity = searchArea(area2,player,entity) -- Search a bigger area
       if not closestEntity then
          closestEntity = searchArea(nil,player,entity) --search entire surface
          if not closestEntity then
-            player.print("Could not find an entity with that name.")
+            player.print("Could not find that entity in the world.")
             return
          end
       end
@@ -79,20 +60,23 @@ function findEntityAndPrintData(player, entity)
 
    local distance = getDistance(player, closestEntity)
 
-   -- Direction determinations
+   -- Direction determinations -------------------------------------------
 
    --first, get the angle between the two points, relative to horiz axis
    local angle = nil
    local xDiff = closestEntity.position.x-playerX
    local yDiff = closestEntity.position.y-playerY
+   --very magic numberful, but numbers should make sense
+
    if xDiff == 0 then
       if yDiff > 0 then
          angle = 90
       else
-         angle = -90
+         angle = 270
       end
    else
       angle = math.deg(math.atan(yDiff/xDiff)) --calc angle
+
       if xDiff > 0 then --fix the angle to be in all 4 quadrants
          angle = angle + 180
       elseif yDiff > 0 then
@@ -101,10 +85,11 @@ function findEntityAndPrintData(player, entity)
    end
 
    game.print(angle)
+   -- Then, get the cardinal direction off of that angle
 
-   -- Then, get the english direction off of that angle
-   direction = getDirection(math.floor(angle))
+   direction = getCardinal(angle)
 
+   --Finally, tell the player the details.
    player.print("The closest " .. closestEntity.name .. " is " .. math.floor(distance) .. " tiles away, to the " ..direction .. ".")
 end
 
@@ -115,7 +100,7 @@ function locate(data)
    if (data.parameter and type(data.parameter) == "string") then --Check usage
       findEntityAndPrintData(player,data.parameter)
    else
-      player.print("Please provide the internal name of the entity to locate, for example fast-inserter. Generally, this is close to the english name of the entity.")
+      player.print("Please provide the internal name of the entity to locate, for example fast-inserter.\nYou can also use the mod's hotkey to learn the internal name of your hovered entity")
    end
 end
 
@@ -142,5 +127,5 @@ end
 script.on_event("compass-find-entity", locateHotkey)
 
 commands.add_command("locate",{"command-help.locate"},locate)
-commands.add_command("l",{"command-help.locate"},locate)
+commands.add_command("loc",{"command-help.locate"},locate)
 commands.add_command("compass",{"command-help.locate"},locate)
